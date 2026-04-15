@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TC Operating Model — Corrected</title>
+<title>TC Operating Model — Saved Rolling Version</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -79,7 +79,7 @@ textarea{resize:vertical;min-height:84px;line-height:1.4;font-family:var(--sans)
 .tbl th:first-child,.tbl td:first-child{position:sticky;left:0;z-index:3;background:var(--surface);text-align:left;min-width:240px;box-shadow:1px 0 0 var(--border2)}
 .tbl th:first-child{z-index:5}
 .tbl td:first-child{font-family:var(--sans);color:var(--muted);font-size:11px}
-.dist-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.dist-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:start}
 .dist-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}
 .dist-name{font-size:10px;color:var(--muted);margin-bottom:5px}
 .dist-pct{font-size:10px;color:var(--muted);margin-bottom:3px}
@@ -148,6 +148,22 @@ button.mini{font-family:var(--sans);font-size:10px;padding:3px 8px;border:1px so
         <div class="ctrl-sub">Months up to this point use actual inputs only. Later months stay forecast.</div>
       </div>
     </div>
+
+    <div class="ctrl-section">
+      <div class="ctrl-label">Model Horizon</div>
+      <div class="ctrl-row">
+        <div class="ctrl-top"><span class="ctrl-name">Rolling Model Through</span><span class="ctrl-val" id="model-end-label">Apr 27</span></div>
+        <select id="model-end-month" onchange="update()"></select>
+        <div class="ctrl-sub">Choose how far out the rolling model runs.</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">
+        <button onclick="saveModelState()" style="font-family:var(--sans);font-size:11px;font-weight:700;padding:7px 14px;background:var(--tc);color:#062126;border:none;border-radius:8px;cursor:pointer;flex:1;">&#128190; Save Model</button>
+        <button onclick="loadModelState()" style="font-family:var(--sans);font-size:11px;font-weight:600;padding:7px 12px;background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:8px;cursor:pointer;">Load</button>
+        <button onclick="clearModelState()" style="font-family:var(--sans);font-size:11px;font-weight:600;padding:7px 12px;background:var(--surface2);color:var(--muted);border:1px solid var(--border2);border-radius:8px;cursor:pointer;">Clear</button>
+      </div>
+      <div style="font-size:10px;color:var(--green);margin-top:6px;font-family:var(--mono);" id="save-status">No saved model loaded.</div>
+    </div>
+
     <hr class="divider">
 
     <div class="ctrl-section">
@@ -186,7 +202,7 @@ button.mini{font-family:var(--sans);font-size:10px;padding:3px 8px;border:1px so
         <input type="range" id="cr-pmg" min="1" max="80" step="1" value="16" oninput="update()">
       </div>
       <div class="ctrl-row">
-        <div class="ctrl-top"><span class="ctrl-name seo-c">TC SEO</span><span class="ctrl-val" id="cr-exitco-val">30%</span></div>
+        <div class="ctrl-top"><span class="ctrl-name seo-c">TC SEO</span><span class="ctrl-val" id="cr-exitco-val">20%</span></div>
         <input type="range" id="cr-exitco" min="1" max="80" step="1" value="20" oninput="update()">
       </div>
     </div>
@@ -286,12 +302,12 @@ button.mini{font-family:var(--sans);font-size:10px;padding:3px 8px;border:1px so
         <input type="range" id="d-bonus" min="0" max="20" step="1" value="10" oninput="update()">
       </div>
       <div class="ctrl-row">
-        <div class="ctrl-top"><span class="ctrl-name">Reserve Floor ($)</span><span class="ctrl-val" id="d-reserve-val">$50,000</span></div>
-        <input type="range" id="d-reserve" min="0" max="200000" step="5000" value="50000" oninput="update()">
+        <div class="ctrl-top"><span class="ctrl-name">Reserve Floor ($)</span></div>
+        <input type="number" id="d-reserve" min="0" max="9999999" step="1000" value="50000" oninput="update()" placeholder="50000" style="font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--tc2);border:1px solid var(--border2);border-radius:7px;padding:7px 10px;width:100%;outline:none;">
       </div>
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:4px;">
         <div class="ctrl-sub" style="margin-bottom:8px;font-weight:700;color:var(--muted);">Partner Split (of distributable)</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;"><span class="pmg-c">D</span><span class="ctrl-val">40%</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;"><span class="pmg-c">Dharmesh</span><span class="ctrl-val">40%</span></div>
         <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;"><span style="color:var(--green)">Chris</span><span class="ctrl-val">40%</span></div>
         <div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--amber)">Shekeb</span><span class="ctrl-val">20%</span></div>
       </div>
@@ -315,7 +331,7 @@ button.mini{font-family:var(--sans);font-size:10px;padding:3px 8px;border:1px so
     <div class="main-header">
       <div>
         <div class="main-title">Timeshare Counsel — Rolling Operating Model</div>
-        <div class="main-sub">Corrected version: closed months are fully actual, plan vs actual variance is month-consistent, reserve is funded from rolling total profit, and client metrics only use actual counts in actual months.</div>
+        <div class="main-sub">Closed months are fully actual, plan vs actual variance is month-consistent, reserve is funded from rolling total profit, and the model horizon can be shortened and saved locally.</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
         <div class="legend-pills">
@@ -386,7 +402,7 @@ button.mini{font-family:var(--sans);font-size:10px;padding:3px 8px;border:1px so
       <div class="be-item"><div class="be-label">Cumulative Break-Even</div><div class="be-val" id="be-cumulative">—</div></div>
     </div>
 
-    <div class="micro-note">Projection begins after the selected Last Actual Month.</div>
+    <div class="micro-note">Projection begins after the selected Last Actual Month and ends at the selected model horizon.</div>
     <div class="chart-card wide" style="margin-bottom:14px;"><div class="card-title">Monthly Cash vs Cost — Actuals + Forecast</div><div class="chart-wrap" style="height:240px"><canvas id="revChart"></canvas></div></div>
     <div class="charts-grid">
       <div class="chart-card"><div class="card-title">Cash Margin % by Month</div><div class="chart-wrap" style="height:180px"><canvas id="marginChart"></canvas></div></div>
@@ -422,32 +438,38 @@ const BASE_STAFF = (990 + 1500 + 1923.08) * W;
 const CSR2 = 500 * 2 * W;
 const CSR3 = 500 * 3 * W;
 const FIXED_OTHER = 900;
+const MODEL_STORAGE_KEY = 'tc_operating_model_v1';
 
-const MONTHS_ALL = ['Dec 25','Jan 26','Feb 26','Mar 26','Apr 26','May 26','Jun 26','Jul 26','Aug 26','Sep 26','Oct 26','Nov 26','Dec 26','Jan 27','Feb 27','Mar 27','Apr 27'];
+const MONTHS_MASTER = [
+  'Dec 25','Jan 26','Feb 26','Mar 26','Apr 26',
+  'May 26','Jun 26','Jul 26','Aug 26','Sep 26','Oct 26','Nov 26','Dec 26',
+  'Jan 27','Feb 27','Mar 27','Apr 27','May 27','Jun 27','Jul 27','Aug 27',
+  'Sep 27','Oct 27','Nov 27','Dec 27'
+];
+
 const HISTORICAL_COUNT = 5;
-const FORECAST_LABELS = MONTHS_ALL.slice(HISTORICAL_COUNT);
 
 const ACTUAL_DEFAULTS = {
-  revenue:[0,7200,8650,8175,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  pmgClients:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  seoClients:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  pmg:[0,0,0,5000,5000,5000,5000,5000,5000,0,0,0,0,0,0,0,0],
-  seo:[0,0,0,0,4198,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995],
-  sales:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  callcenter:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  revenue:[0,7200,8650,8175,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  pmgClients:[0,6,6,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  seoClients:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  pmg:[0,0,0,5000,5000,5000,5000,5000,5000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  seo:[0,0,0,0,4198,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995,8995],
+  sales:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  callcenter:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 };
 
 const EC_COMMITTED = [30,50];
 const EC_PRESETS = {
-  cons:[30,50,60,70,80,90,90,90,90,90,90,90],
-  mod:[30,50,80,110,140,160,180,180,180,180,180,180],
-  agg:[30,50,100,150,200,250,300,300,300,300,300,300]
+  cons:[30,50,60,70,80,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90],
+  mod:[30,50,80,110,140,160,180,180,180,180,180,180,180,180,180,180,180,180,180,180],
+  agg:[30,50,100,150,200,250,300,300,300,300,300,300,300,300,300,300,300,300,300,300]
 };
 
 const SALES_PRESETS = {
-  cons:[0,0,0,0,0,0,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000],
-  base:[0,0,0,0,0,0,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000],
-  heavy:[0,0,0,0,0,0,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000]
+  cons:[0,0,0,0,0,0,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000],
+  base:[0,0,0,0,0,0,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000],
+  heavy:[0,0,0,0,0,0,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000,7000]
 };
 
 const CALLCENTER_PRESETS = {
@@ -464,6 +486,10 @@ let activeCallCenterPreset='base';
 let currentScenarioName='Base';
 let revChart, marginChart, cumulChart, _lastEmailHtml='';
 
+function getModelEndIndex(){ const el=document.getElementById('model-end-month'); return el?parseInt(el.value||'16',10):16; }
+function getActiveMonths(){ return MONTHS_MASTER.slice(0,getModelEndIndex()+1); }
+function getForecastLabels(){ return getActiveMonths().slice(HISTORICAL_COUNT); }
+
 function fmt(n){ if(n===null||n===undefined||isNaN(n)) return '—'; const abs=Math.abs(n); const s=abs>=1e6?(abs/1e6).toFixed(2)+'M':abs>=1e3?(Math.round(abs/100)*100).toLocaleString():Math.round(abs).toLocaleString(); return (n<0?'-':'')+'$'+s; }
 function fmtE(n){ if(n===null||n===undefined||isNaN(n)) return '—'; return (n<0?'-$':'$')+Math.abs(Math.round(n)).toLocaleString(); }
 function fmtEmail(n){ if(n===null||n===undefined||isNaN(n)) return '—'; const abs=Math.abs(n); const s=abs>=1e6?(abs/1e6).toFixed(2)+'M':abs>=1e3?(Math.round(abs/100)*100).toLocaleString():Math.round(abs).toLocaleString(); return (n<0?'($':'$')+s+(n<0?')':''); }
@@ -477,78 +503,99 @@ function copyEmailHtml(){ copyTextFromElement('email-html-output'); }
 function copyEmailText(){ copyTextFromElement('email-text-output'); }
 async function copyExecutiveSummary(){ const bullets=Array.from(document.querySelectorAll('#partner-summary-bullets li')).map(li=>'• '+li.textContent).join('\n'); try{ await navigator.clipboard.writeText(bullets); } catch(e){ const t=document.createElement('textarea'); t.value=bullets; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); } }
 
-function buildLastActualSelect(){ const sel=document.getElementById('last-actual-month'); sel.innerHTML=MONTHS_ALL.map((m,i)=>`<option value="${i}" ${i===4?'selected':''}>${m}</option>`).join(''); }
+function buildLastActualSelect(){ const sel=document.getElementById('last-actual-month'); sel.innerHTML=MONTHS_MASTER.map((m,i)=>`<option value="${i}" ${i===4?'selected':''}>${m}</option>`).join(''); }
+
+function buildModelEndSelect(){
+  const sel=document.getElementById('model-end-month');
+  if(!sel) return;
+  sel.innerHTML=MONTHS_MASTER.map((m,i)=>{ if(i<HISTORICAL_COUNT-1) return ''; const selected=i===16?'selected':''; return `<option value="${i}" ${selected}>${m}</option>`; }).join('');
+  document.getElementById('model-end-label').textContent=MONTHS_MASTER[parseInt(sel.value||'16',10)];
+}
+function syncModelEndLabel(){ const sel=document.getElementById('model-end-month'); if(!sel) return; document.getElementById('model-end-label').textContent=MONTHS_MASTER[parseInt(sel.value||'16',10)]; }
 
 function buildGrid(containerId,prefix,defaults){
   const grid=document.getElementById(containerId);
-  grid.innerHTML=MONTHS_ALL.map((lbl,i)=>`<div style="display:flex;flex-direction:column;gap:2px;"><label style="font-size:9px;color:var(--muted);">${lbl}</label><input type="number" id="${prefix}-${i}" value="${defaults[i]||0}" min="0" max="999999" step="100" oninput="update()" style="font-family:var(--mono);font-size:11px;width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:4px 6px;color:var(--text);outline:none;"></div>`).join('');
+  const months=getActiveMonths();
+  grid.innerHTML=months.map((lbl,i)=>`<div style="display:flex;flex-direction:column;gap:2px;"><label style="font-size:9px;color:var(--muted);">${lbl}</label><input type="number" id="${prefix}-${i}" value="${defaults[i]||0}" min="0" max="999999" step="100" oninput="update()" style="font-family:var(--mono);font-size:11px;width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:4px 6px;color:var(--text);outline:none;"></div>`).join('');
 }
 function getActualValue(prefix,i){ const el=document.getElementById(`${prefix}-${i}`); return el?(parseFloat(el.value)||0):0; }
 
 function buildEcGrid(){
   const grid=document.getElementById('ec-monthly-grid');
-  grid.innerHTML=FORECAST_LABELS.map((lbl,i)=>{
-    const locked=i<2, val=locked?EC_COMMITTED[i]:EC_PRESETS.mod[i];
-    return `<div style="display:flex;flex-direction:column;gap:2px;"><label style="font-size:9px;color:${locked?'var(--seo)':'var(--muted)'};">${lbl}${locked?' ●':''}</label><input type="number" id="ec-m${i}" value="${val}" min="0" max="500" step="5" ${locked?'readonly':''} oninput="activeEcPreset=null;ecBaseValues=null;highlightEcPreset();update();" style="font-family:var(--mono);font-size:11px;width:100%;background:${locked?'rgba(79,167,175,.09)':'var(--surface2)'};border:1px solid ${locked?'rgba(79,167,175,.28)':'var(--border2)'};border-radius:6px;padding:4px 6px;color:var(--text);outline:none;"></div>`;
-  }).join('');
+  const forecastLabels=getForecastLabels();
+  grid.innerHTML=forecastLabels.map((lbl,i)=>{ const locked=i<2; const preset=EC_PRESETS.mod[i]??EC_PRESETS.mod[EC_PRESETS.mod.length-1]; const val=locked?(EC_COMMITTED[i]??preset):preset; return `<div style="display:flex;flex-direction:column;gap:2px;"><label style="font-size:9px;color:${locked?'var(--seo)':'var(--muted)'};">${lbl}${locked?' ●':''}</label><input type="number" id="ec-m${i}" value="${val}" min="0" max="500" step="5" ${locked?'readonly':''} oninput="activeEcPreset=null;ecBaseValues=null;highlightEcPreset();update();" style="font-family:var(--mono);font-size:11px;width:100%;background:${locked?'rgba(79,167,175,.09)':'var(--surface2)'};border:1px solid ${locked?'rgba(79,167,175,.28)':'var(--border2)'};border-radius:6px;padding:4px 6px;color:var(--text);outline:none;"></div>`; }).join('');
 }
 function getEcProspects(i){ const el=document.getElementById('ec-m'+i); return el?Math.max(0,parseInt(el.value)||0):0; }
-function loadEcPreset(name){ activeEcPreset=name; ecBaseValues=null; EC_PRESETS[name].forEach((v,i)=>{ if(i>=2){ const el=document.getElementById('ec-m'+i); if(el) el.value=v; } }); const mult=document.getElementById('ec-multiplier'); if(mult&&parseInt(mult.value)!==0) applyEcMultiplier(mult.value); highlightEcPreset(); update(); }
+function loadEcPreset(name){ activeEcPreset=name; ecBaseValues=null; const labels=getForecastLabels(); labels.forEach((_,i)=>{ const source=EC_PRESETS[name][i]??EC_PRESETS[name][EC_PRESETS[name].length-1]??0; if(i>=2){ const el=document.getElementById('ec-m'+i); if(el) el.value=source; } }); const mult=document.getElementById('ec-multiplier'); if(mult&&parseInt(mult.value)!==0) applyEcMultiplier(mult.value); highlightEcPreset(); update(); }
 function highlightEcPreset(){ ['cons','mod','agg'].forEach(p=>{ const btn=document.getElementById('ec-'+p); if(!btn) return; btn.style.background=activeEcPreset===p?'var(--tc)':'transparent'; btn.style.color=activeEcPreset===p?'#082025':'var(--muted)'; btn.style.borderColor=activeEcPreset===p?'var(--tc)':'var(--border2)'; }); }
-function applyEcMultiplier(pct){ const val=parseInt(pct)||0; document.getElementById('ec-mult-val').textContent=(val>=0?'+':'')+val+'%'; if(ecBaseValues===null){ ecBaseValues=[]; for(let i=2;i<FORECAST_LABELS.length;i++){ const el=document.getElementById('ec-m'+i); ecBaseValues[i]=el?(parseFloat(el.value)||0):0; } } const factor=1+val/100; for(let i=2;i<FORECAST_LABELS.length;i++){ const el=document.getElementById('ec-m'+i); if(el) el.value=Math.round((ecBaseValues[i]||0)*factor); } }
+function applyEcMultiplier(pct){ const val=parseInt(pct)||0; document.getElementById('ec-mult-val').textContent=(val>=0?'+':'')+val+'%'; const fl=getForecastLabels(); if(ecBaseValues===null){ ecBaseValues=[]; for(let i=2;i<fl.length;i++){ const el=document.getElementById('ec-m'+i); ecBaseValues[i]=el?(parseFloat(el.value)||0):0; } } const factor=1+val/100; for(let i=2;i<fl.length;i++){ const el=document.getElementById('ec-m'+i); if(el) el.value=Math.round((ecBaseValues[i]||0)*factor); } }
 function resetEcMultiplier(){ ecBaseValues=null; document.getElementById('ec-multiplier').value=0; document.getElementById('ec-mult-val').textContent='+0%'; if(activeEcPreset) loadEcPreset(activeEcPreset); else update(); }
 
 function buildSalesGrid(){
   const grid=document.getElementById('sales-monthly-grid');
+  const months=getActiveMonths();
   const pv=SALES_PRESETS.base;
-  grid.innerHTML=MONTHS_ALL.map((lbl,i)=>`<div style="display:flex;flex-direction:column;gap:2px;"><label style="font-size:9px;color:${i<HISTORICAL_COUNT?'var(--green)':'var(--muted)'};">${lbl}${i<HISTORICAL_COUNT?' ●':''}</label><input type="number" id="sales-m${i}" value="${pv[i]}" min="0" max="99999" step="100" oninput="salesBaseValues=null;activeSalesPreset=null;highlightSalesPreset();update();" style="font-family:var(--mono);font-size:11px;width:100%;background:${i<HISTORICAL_COUNT?'rgba(51,196,141,.07)':'var(--surface2)'};border:1px solid ${i<HISTORICAL_COUNT?'rgba(51,196,141,.24)':'var(--border2)'};border-radius:6px;padding:4px 6px;color:var(--text);outline:none;"></div>`).join('');
+  grid.innerHTML=months.map((lbl,i)=>`<div style="display:flex;flex-direction:column;gap:2px;"><label style="font-size:9px;color:${i<HISTORICAL_COUNT?'var(--green)':'var(--muted)'};">${lbl}${i<HISTORICAL_COUNT?' ●':''}</label><input type="number" id="sales-m${i}" value="${pv[i]??pv[pv.length-1]??0}" min="0" max="99999" step="100" oninput="salesBaseValues=null;activeSalesPreset=null;highlightSalesPreset();update();" style="font-family:var(--mono);font-size:11px;width:100%;background:${i<HISTORICAL_COUNT?'rgba(51,196,141,.07)':'var(--surface2)'};border:1px solid ${i<HISTORICAL_COUNT?'rgba(51,196,141,.24)':'var(--border2)'};border-radius:6px;padding:4px 6px;color:var(--text);outline:none;"></div>`).join('');
 }
 function getSalesPlan(i){ const el=document.getElementById('sales-m'+i); return el?(parseFloat(el.value)||0):0; }
-function loadSalesPreset(name){ activeSalesPreset=name; salesBaseValues=null; SALES_PRESETS[name].forEach((v,i)=>{ const el=document.getElementById('sales-m'+i); if(el) el.value=v; }); const mult=document.getElementById('sales-multiplier'); if(mult&&parseInt(mult.value)!==0) applySalesMultiplier(mult.value); highlightSalesPreset(); update(); }
+function loadSalesPreset(name){ activeSalesPreset=name; salesBaseValues=null; const months=getActiveMonths(); months.forEach((_,i)=>{ const el=document.getElementById('sales-m'+i); if(el) el.value=SALES_PRESETS[name][i]??SALES_PRESETS[name][SALES_PRESETS[name].length-1]??0; }); const mult=document.getElementById('sales-multiplier'); if(mult&&parseInt(mult.value)!==0) applySalesMultiplier(mult.value); highlightSalesPreset(); update(); }
 function highlightSalesPreset(){ ['cons','base','heavy'].forEach(p=>{ const btn=document.getElementById('sales-'+p); if(!btn) return; btn.style.background=activeSalesPreset===p?'var(--tc)':'transparent'; btn.style.color=activeSalesPreset===p?'#082025':'var(--muted)'; btn.style.borderColor=activeSalesPreset===p?'var(--tc)':'var(--border2)'; }); }
-function applySalesMultiplier(pct){ const val=parseInt(pct)||0; document.getElementById('sales-mult-val').textContent=(val>=0?'+':'')+val+'%'; if(salesBaseValues===null){ salesBaseValues=[]; for(let i=0;i<MONTHS_ALL.length;i++){ const el=document.getElementById('sales-m'+i); salesBaseValues[i]=el?(parseFloat(el.value)||0):0; } } const factor=1+val/100; for(let i=0;i<MONTHS_ALL.length;i++){ const el=document.getElementById('sales-m'+i); if(el) el.value=Math.round((salesBaseValues[i]||0)*factor); } }
+function applySalesMultiplier(pct){ const val=parseInt(pct)||0; document.getElementById('sales-mult-val').textContent=(val>=0?'+':'')+val+'%'; const months=getActiveMonths(); if(salesBaseValues===null){ salesBaseValues=[]; for(let i=0;i<months.length;i++){ const el=document.getElementById('sales-m'+i); salesBaseValues[i]=el?(parseFloat(el.value)||0):0; } } const factor=1+val/100; for(let i=0;i<months.length;i++){ const el=document.getElementById('sales-m'+i); if(el) el.value=Math.round((salesBaseValues[i]||0)*factor); } }
 function resetSalesMultiplier(){ salesBaseValues=null; document.getElementById('sales-multiplier').value=0; document.getElementById('sales-mult-val').textContent='+0%'; if(activeSalesPreset) loadSalesPreset(activeSalesPreset); else update(); }
 
 function loadCallCenterPreset(name){ activeCallCenterPreset=name; const p=CALLCENTER_PRESETS[name]; document.getElementById('cc-capacity').value=p.leadsPerAgent; document.getElementById('cc-dialer').value=p.dialerPerSeat; document.getElementById('cc-buffer').value=Math.round(p.qaBuffer*100); highlightCallCenterPreset(); update(); }
 function highlightCallCenterPreset(){ ['cons','base','agg'].forEach(p=>{ const btn=document.getElementById('cc-'+p); if(!btn) return; btn.style.background=activeCallCenterPreset===p?'var(--tc)':'transparent'; btn.style.color=activeCallCenterPreset===p?'#082025':'var(--muted)'; btn.style.borderColor=activeCallCenterPreset===p?'var(--tc)':'var(--border2)'; }); }
 
+function collectModelState(){ const state={}; document.querySelectorAll('input,select,textarea').forEach(el=>{ if(!el.id) return; if(el.type==='button'||el.type==='submit') return; state[el.id]=el.value; }); state.currentScenarioName=currentScenarioName||'Base'; state.activeEcPreset=activeEcPreset; state.activeSalesPreset=activeSalesPreset; state.activeCallCenterPreset=activeCallCenterPreset; return state; }
+function applyModelState(state){ 
+  if(!state) return;
+  // Apply non-grid values immediately (sliders, selects, etc.)
+  Object.entries(state).forEach(([id,value])=>{ 
+    const el=document.getElementById(id); 
+    if(!el) return; 
+    el.value=value; 
+  }); 
+  if(state.currentScenarioName) currentScenarioName=state.currentScenarioName; 
+  if(state.activeEcPreset!==undefined) activeEcPreset=state.activeEcPreset; 
+  if(state.activeSalesPreset!==undefined) activeSalesPreset=state.activeSalesPreset; 
+  if(state.activeCallCenterPreset!==undefined) activeCallCenterPreset=state.activeCallCenterPreset; 
+  highlightEcPreset(); highlightSalesPreset(); highlightCallCenterPreset(); 
+  syncModelEndLabel();
+  // Force rebuild guard to fire so grids are rebuilt fresh
+  window.__lastModelEndIndex = null;
+  // Store state so rebuild guard can re-apply grid values after rebuilding
+  window.__pendingSavedState = state;
+  update(); 
+}
+function saveModelState(){ const state=collectModelState(); localStorage.setItem(MODEL_STORAGE_KEY,JSON.stringify(state)); const s=document.getElementById('save-status'); if(s) s.textContent='Model saved locally in this browser.'; }
+function loadModelState(){ const raw=localStorage.getItem(MODEL_STORAGE_KEY); if(!raw){ const s=document.getElementById('save-status'); if(s) s.textContent='No saved model found.'; return; } try{ const state=JSON.parse(raw); applyModelState(state); const s=document.getElementById('save-status'); if(s) s.textContent='Saved model loaded.'; } catch(e){ const s=document.getElementById('save-status'); if(s) s.textContent='Saved model could not be loaded.'; } }
+function clearModelState(){ localStorage.removeItem(MODEL_STORAGE_KEY); const s=document.getElementById('save-status'); if(s) s.textContent='Saved model cleared.'; }
+
 function baseStaffPlanForMonth(gi){ return BASE_STAFF+(gi>=8?CSR3:CSR2); }
 function distributePmgProspects(totalRemaining){ const aprRelease=Math.min(totalRemaining,100), mayRelease=Math.max(0,totalRemaining-aprRelease); return {aprRelease,mayRelease}; }
 
 function computePlanCallCenterCost(seoProspects){
-  const agentWeekly=500;
-  const leadsPerAgent=+document.getElementById('cc-capacity').value;
-  const dialerPerSeat=+document.getElementById('cc-dialer').value;
-  const qaBuffer=(+document.getElementById('cc-buffer').value||0)/100;
+  const agentWeekly=500, leadsPerAgent=+document.getElementById('cc-capacity').value, dialerPerSeat=+document.getElementById('cc-dialer').value, qaBuffer=(+document.getElementById('cc-buffer').value||0)/100;
   const requiredAgents=Math.max(0,Math.ceil(seoProspects/Math.max(1,leadsPerAgent)));
-  const labor=requiredAgents*agentWeekly*W;
-  const dialer=requiredAgents*dialerPerSeat;
-  const baseCost=labor+dialer;
-  const totalCost=baseCost*(1+qaBuffer);
+  const labor=requiredAgents*agentWeekly*W, dialer=requiredAgents*dialerPerSeat, baseCost=labor+dialer, totalCost=baseCost*(1+qaBuffer);
   return {requiredAgents,labor,dialer,qaBufferCost:totalCost-baseCost,totalCost};
 }
 
-function projectionForMonth(gi){
+function projectionForMonth(gi,monthsOverride){
+  const MONTHS_ALL=monthsOverride||getActiveMonths();
   const mi=gi-HISTORICAL_COUNT;
   const totalRemaining=+document.getElementById('v-pmg').value;
-  const fPmg=+document.getElementById('f-pmg').value;
-  const fSeo=+document.getElementById('f-exitco').value;
-  const crPmg=+document.getElementById('cr-pmg').value/100;
-  const crSeo=+document.getElementById('cr-exitco').value/100;
-  const commRate=+document.getElementById('c-comm').value/100;
-  const attr=+document.getElementById('c-attr').value/100;
-  const seoPlanCost=+document.getElementById('c-mkt').value;
+  const fPmg=+document.getElementById('f-pmg').value, fSeo=+document.getElementById('f-exitco').value;
+  const crPmg=+document.getElementById('cr-pmg').value/100, crSeo=+document.getElementById('cr-exitco').value/100;
+  const commRate=+document.getElementById('c-comm').value/100, attr=+document.getElementById('c-attr').value/100, seoPlanCost=+document.getElementById('c-mkt').value;
   const {aprRelease,mayRelease}=distributePmgProspects(totalRemaining);
-  const aprClients=Math.round(aprRelease*crPmg*(1-attr));
-  const mayClients=Math.round(mayRelease*crPmg*(1-attr));
-  const pmgByMonth=[Math.round(aprClients*0.6),Math.round(aprClients*0.4)+Math.round(mayClients*0.6),Math.round(mayClients*0.4),0,0,0,0,0,0,0,0,0];
+  const aprClients=Math.round(aprRelease*crPmg*(1-attr)), mayClients=Math.round(mayRelease*crPmg*(1-attr));
+  const pmgByMonth=[Math.round(aprClients*0.6),Math.round(aprClients*0.4)+Math.round(mayClients*0.6),Math.round(mayClients*0.4),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
   const pmgClients=pmgByMonth[mi]||0;
   const seoProspects=getEcProspects(mi);
   const seoClients=Math.round(seoProspects*crSeo*(1-attr));
   const revPmg=pmgClients*fPmg, revSeo=seoClients*fSeo, bookedRevenue=revPmg+revSeo;
-  const pmgRetainer=mi<=3?5000:0;
-  const baseStaff=baseStaffPlanForMonth(gi);
-  const salesStaff=getSalesPlan(gi);
+  const pmgRetainer=mi<=3?5000:0, baseStaff=baseStaffPlanForMonth(gi), salesStaff=getSalesPlan(gi);
   const callCenter=computePlanCallCenterCost(seoProspects);
   const commission=revSeo*commRate;
   const totalCost=baseStaff+salesStaff+callCenter.totalCost+FIXED_OTHER+pmgRetainer+seoPlanCost+commission;
@@ -596,8 +643,32 @@ function updatePartnerOutputs(data){
 }
 
 function update(){
-  const cutoff=parseInt(document.getElementById('last-actual-month').value||'4');
-  document.getElementById('reporting-cutoff-label').textContent=MONTHS_ALL[cutoff];
+  const activeMonths=getActiveMonths();
+  syncModelEndLabel();
+
+  if(window.__lastModelEndIndex!==getModelEndIndex()){
+    window.__lastModelEndIndex=getModelEndIndex();
+    buildEcGrid(); buildSalesGrid();
+    buildGrid('actual-revenue-grid','act-rev',ACTUAL_DEFAULTS.revenue);
+    buildGrid('actual-pmg-clients-grid','act-pmgc',ACTUAL_DEFAULTS.pmgClients);
+    buildGrid('actual-seo-clients-grid','act-seoc',ACTUAL_DEFAULTS.seoClients);
+    buildGrid('actual-pmg-grid','act-pmg',ACTUAL_DEFAULTS.pmg);
+    buildGrid('actual-seo-grid','act-seo',ACTUAL_DEFAULTS.seo);
+    buildGrid('actual-sales-grid','act-sales',ACTUAL_DEFAULTS.sales);
+    buildGrid('actual-callcenter-grid','act-call',ACTUAL_DEFAULTS.callcenter);
+    // Re-apply saved state over the freshly-built grids
+    const pending = window.__pendingSavedState;
+    if(pending){
+      window.__pendingSavedState = null;
+      Object.entries(pending).forEach(([id,value])=>{ const el=document.getElementById(id); if(el) el.value=value; });
+      // fall through to render with restored values
+    }
+  }
+
+  const MONTHS_ALL=activeMonths;
+  const cutoffRaw=parseInt(document.getElementById('last-actual-month').value||'4');
+  const cutoff=Math.min(cutoffRaw,MONTHS_ALL.length-1);
+  document.getElementById('reporting-cutoff-label').textContent=MONTHS_ALL[cutoff]||MONTHS_MASTER[cutoffRaw];
   ['v-pmg'].forEach(id=>document.getElementById(id+'-val').textContent=document.getElementById(id).value);
   ['cr-pmg','cr-exitco','c-comm','c-attr'].forEach(id=>document.getElementById(id+'-val').textContent=document.getElementById(id).value+'%');
   ['f-pmg','f-exitco','c-mkt'].forEach(id=>document.getElementById(id+'-val').textContent='$'+Number(document.getElementById(id).value).toLocaleString());
@@ -607,7 +678,6 @@ function update(){
   document.getElementById('col-up-val').textContent=document.getElementById('col-up').value+'%';
   document.getElementById('col-lag-val').textContent=document.getElementById('col-lag').value;
   document.getElementById('d-bonus-val').textContent=document.getElementById('d-bonus').value+'%';
-  document.getElementById('d-reserve-val').textContent='$'+Number(document.getElementById('d-reserve').value).toLocaleString();
 
   const colUp=+document.getElementById('col-up').value/100;
   const colLag=+document.getElementById('col-lag').value;
@@ -615,7 +685,7 @@ function update(){
   const reserveTarget=+document.getElementById('d-reserve').value;
 
   const planForecastMonths=[];
-  for(let gi=HISTORICAL_COUNT;gi<MONTHS_ALL.length;gi++) planForecastMonths.push(projectionForMonth(gi));
+  for(let gi=HISTORICAL_COUNT;gi<MONTHS_ALL.length;gi++) planForecastMonths.push(projectionForMonth(gi,MONTHS_ALL));
   const planBooked=planForecastMonths.map(p=>p.bookedRevenue);
   const planCash=applyCollection(planBooked,colUp,colLag);
   const planByMonth={};
@@ -688,10 +758,8 @@ function update(){
   const labels=modelMonths.map(m=>m.label);
   if(revChart) revChart.destroy();
   revChart=new Chart(document.getElementById('revChart'),{type:'bar',data:{labels,datasets:[{label:'Actual Cash',data:modelMonths.map(m=>m.isActual?m.displayRevenue:0),backgroundColor:'rgba(51,196,141,.78)',borderRadius:4,stack:'cash'},{label:'Forecast Cash',data:modelMonths.map(m=>!m.isActual?m.displayRevenue:0),backgroundColor:'rgba(79,167,175,.78)',borderRadius:4,stack:'cash'},{label:'Total Cost',data:modelMonths.map(m=>m.totalCost),type:'line',borderColor:'#ef6b6b',backgroundColor:'transparent',borderWidth:1.8,pointRadius:3,pointBackgroundColor:'#ef6b6b',tension:.28}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#7f9498',font:{size:10}}},y:{stacked:true,grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#7f9498',font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
-
   if(marginChart) marginChart.destroy();
   marginChart=new Chart(document.getElementById('marginChart'),{type:'line',data:{labels,datasets:[{data:modelMonths.map(m=>m.isActual?(m.margin!==null?+(m.margin*100).toFixed(1):null):null),borderColor:'#33c48d',borderWidth:1.8,pointRadius:3,pointBackgroundColor:'#33c48d',tension:.28},{data:modelMonths.map(m=>!m.isActual?(m.margin!==null?+(m.margin*100).toFixed(1):null):null),borderColor:'#4FA7AF',borderWidth:1.8,pointRadius:3,pointBackgroundColor:'#4FA7AF',tension:.28}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#7f9498',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#7f9498',font:{size:10},callback:v=>v+'%'}}}}});
-
   if(cumulChart) cumulChart.destroy();
   cumulChart=new Chart(document.getElementById('cumulChart'),{type:'line',data:{labels,datasets:[{data:cumData,borderColor:'#4FA7AF',backgroundColor:'rgba(79,167,175,.08)',fill:true,borderWidth:1.8,pointRadius:3,pointBackgroundColor:cumData.map(v=>v>=0?'#33c48d':'#ef6b6b'),tension:.28}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#7f9498',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#7f9498',font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
 
@@ -712,9 +780,9 @@ function update(){
     {label:'SEO Qual Agents Needed',vals:modelMonths.map(m=>m.isActual?null:(m.callCenterAgents||0)),total:futureMonths.reduce((s,m)=>s+(m.callCenterAgents||0),0),render:tdClients,totalClass:'seo-c'},
     {label:'Base Staffing',vals:modelMonths.map(m=>m.baseStaff),total:modelMonths.reduce((s,m)=>s+m.baseStaff,0),render:tdVal,totalClass:'red'},
     {label:'Core Sales Staffing',vals:modelMonths.map(m=>m.salesStaff),total:modelMonths.reduce((s,m)=>s+m.salesStaff,0),render:tdVal,totalClass:'red'},
-    {label:'Call Center Labor',vals:modelMonths.map(m=>m.callCenterLabor||m.callCenterCost||0),total:modelMonths.reduce((s,m)=>s+(m.callCenterLabor||m.callCenterCost||0),0),render:tdVal,totalClass:'red'},
-    {label:'Dialer / Seat Stack',vals:modelMonths.map(m=>m.callCenterDialer||0),total:modelMonths.reduce((s,m)=>s+(m.callCenterDialer||0),0),render:tdVal,totalClass:'amber'},
-    {label:'QA / Shrinkage Buffer',vals:modelMonths.map(m=>m.callCenterBuffer||0),total:modelMonths.reduce((s,m)=>s+(m.callCenterBuffer||0),0),render:tdVal,totalClass:'amber'},
+    {label:'Call Center Labor',vals:modelMonths.map(m=>m.isActual?null:(m.callCenterLabor||0)),total:futureMonths.reduce((s,m)=>s+(m.callCenterLabor||0),0),render:tdVal,totalClass:'red'},
+    {label:'Dialer / Seat Stack',vals:modelMonths.map(m=>m.isActual?null:(m.callCenterDialer||0)),total:futureMonths.reduce((s,m)=>s+(m.callCenterDialer||0),0),render:tdVal,totalClass:'amber'},
+    {label:'QA / Shrinkage Buffer',vals:modelMonths.map(m=>m.isActual?null:(m.callCenterBuffer||0)),total:futureMonths.reduce((s,m)=>s+(m.callCenterBuffer||0),0),render:tdVal,totalClass:'amber'},
     {label:'Call Center Cost',vals:modelMonths.map(m=>m.callCenterCost||0),total:modelMonths.reduce((s,m)=>s+(m.callCenterCost||0),0),render:tdVal,totalClass:'red'},
     {label:'TC SEO Sales Commission',vals:modelMonths.map(m=>m.commission||0),total:modelMonths.reduce((s,m)=>s+(m.commission||0),0),render:tdVal,totalClass:'amber'},
     {label:'Fixed (software+phones)',vals:modelMonths.map(()=>FIXED_OTHER),total:FIXED_OTHER*modelMonths.length,render:tdVal,totalClass:'amber'},
@@ -729,42 +797,192 @@ function update(){
 
   document.getElementById('pl-tbody').innerHTML=rows.map(r=>{ const cells=r.vals.map((v,i)=>r.render(v,modelMonths[i],i)).join(''); const totalCell=r.total===null?'<td>—</td>':`<td class="${r.totalClass||''}" style="font-weight:700;">${r.render===tdClients?Math.round(r.total).toLocaleString():fmtE(r.total)}</td>`; return `<tr class="${r.isTotal?'total':''}"><td>${r.label}</td>${cells}${totalCell}</tr>`; }).join('');
 
-  let cumulativeReserve=0, distributableCash=0, fundedReserve=0;
-  modelMonths.forEach(m=>{ cumulativeReserve+=m.displayProfit; fundedReserve=Math.max(0,Math.min(cumulativeReserve,reserveTarget)); if(cumulativeReserve>reserveTarget){ distributableCash+=(cumulativeReserve-reserveTarget); cumulativeReserve=reserveTarget; } });
-  const staffBonus=Math.max(0,distributableCash*dBonus);
-  const afterBonus=distributableCash-staffBonus;
+  const cumulativeProfit=modelMonths.reduce((s,m)=>s+m.displayProfit,0);
+  const fundedReserve=Math.max(0,Math.min(cumulativeProfit,reserveTarget));
+  const distributableBase=Math.max(0,cumulativeProfit-reserveTarget);
+  const staffBonus=Math.max(0,distributableBase*dBonus);
+  const afterBonus=Math.max(0,distributableBase-staffBonus);
   const dShare=afterBonus*0.40, chrisShare=afterBonus*0.40, shekebShare=afterBonus*0.20;
-  document.getElementById('dist-grid').innerHTML=[
-    {name:'Reserve Funded',pct:'Target: '+fmtE(reserveTarget),amt:fundedReserve,cls:'amber'},
-    {name:'Staff Bonus',pct:(dBonus*100).toFixed(0)+'% of net',amt:staffBonus,cls:'green'},
-    {name:'Dharmesh',pct:'40%',amt:dShare,cls:'pmg-c'},
-    {name:'Chris',pct:'40%',amt:chrisShare,cls:'seo-c'},
-    {name:'Shekeb',pct:'20%',amt:shekebShare,cls:'amber'}
-  ].map(d=>`<div class="dist-card"><div class="dist-name">${d.name}</div><div class="dist-pct">${d.pct}</div><div class="dist-amt ${d.cls}">${fmtE(d.amt)}</div></div>`).join('');
+
+  document.getElementById('dist-grid').innerHTML=`
+    <div class="dist-card"><div class="dist-name">Cum. Profit</div><div class="dist-pct">before reserve</div><div class="dist-amt seo-c">${fmtE(cumulativeProfit)}</div></div>
+    <div class="dist-card"><div class="dist-name">Reserve Funded</div><div class="dist-pct">Target: ${fmtE(reserveTarget)}</div><div class="dist-amt amber">${fmtE(fundedReserve)}</div></div>
+    <div class="dist-card"><div class="dist-name">Distributable</div><div class="dist-pct">after reserve</div><div class="dist-amt green">${fmtE(distributableBase)}</div></div>
+    <div class="dist-card" style="grid-column:span 2;padding:14px 16px;">
+      <div class="dist-name" style="margin-bottom:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Partner Distribution</div>
+      <div style="display:grid;grid-template-columns:1fr 48px 1fr;gap:6px 0;align-items:center;">
+        <span style="font-size:11px;color:var(--pmg);font-weight:600;">Dharmesh</span>
+        <span style="font-size:10px;color:var(--muted);text-align:center;">40%</span>
+        <span style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--pmg);text-align:right;">${fmtE(dShare)}</span>
+        <div style="grid-column:span 3;height:1px;background:var(--border);margin:4px 0;"></div>
+        <span style="font-size:11px;color:var(--green);font-weight:600;">Chris</span>
+        <span style="font-size:10px;color:var(--muted);text-align:center;">40%</span>
+        <span style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--green);text-align:right;">${fmtE(chrisShare)}</span>
+        <div style="grid-column:span 3;height:1px;background:var(--border);margin:4px 0;"></div>
+        <span style="font-size:11px;color:var(--amber);font-weight:600;">Shekeb</span>
+        <span style="font-size:10px;color:var(--muted);text-align:center;">20%</span>
+        <span style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--amber);text-align:right;">${fmtE(shekebShare)}</span>
+      </div>
+    </div>
+  `;
 
   const reserveShortfall=Math.max(0,reserveTarget-fundedReserve);
   updatePartnerOutputs({cutoffLabel:MONTHS_ALL[cutoff],actualCashCollected,ytdRevenueVariance,ytdRevenueVariancePct,ytdProfitVariance,ytdProfitVariancePct,trough,troughMonth,fundedReserve,reserveShortfall,reserveTarget,firstFutureProfitMonth:firstFutureProfitMonth?firstFutureProfitMonth.label:null,cumulativeBE,pmgDragMonths});
-  buildEmailOutput(modelMonths,{cutoffLabel:MONTHS_ALL[cutoff],actualCashCollected,ytdRevenueVariance,trough,troughMonth,reserveShortfall,fundedReserve,reserveTarget,firstFutureProfitMonth:firstFutureProfitMonth?firstFutureProfitMonth.label:null,cumulativeBE,pmgDragMonths,dShare,chrisShare,shekebShare,staffBonus});
+  buildEmailOutput(modelMonths,{cutoffLabel:MONTHS_ALL[cutoff],actualCashCollected,ytdRevenueVariance,trough,troughMonth,reserveShortfall,fundedReserve,reserveTarget,firstFutureProfitMonth:firstFutureProfitMonth?firstFutureProfitMonth.label:null,cumulativeBE,pmgDragMonths,dShare,chrisShare,shekebShare,staffBonus,cumulativeProfit,distributableBase});
 }
 
 function buildEmailOutput(modelMonths,summary){
-  const {cutoffLabel,actualCashCollected,ytdRevenueVariance,trough,troughMonth,reserveShortfall,fundedReserve,reserveTarget,firstFutureProfitMonth,cumulativeBE,pmgDragMonths,dShare,chrisShare,shekebShare,staffBonus}=summary;
+  const {cutoffLabel,actualCashCollected,ytdRevenueVariance,trough,troughMonth,reserveShortfall,fundedReserve,reserveTarget,firstFutureProfitMonth,cumulativeBE,pmgDragMonths,dShare,chrisShare,shekebShare,staffBonus,cumulativeProfit,distributableBase}=summary;
   const notes=(document.getElementById('partner-notes').value||'').trim();
   const bullets=Array.from(document.querySelectorAll('#partner-summary-bullets li')).map(li=>li.textContent);
-  const emailMonths=modelMonths.map(m=>`<th style="padding:7px 8px;text-align:right;font-family:courier,monospace;font-size:9px;font-weight:700;color:${m.isActual?'#33c48d':'#7FD2D8'};border-bottom:1px solid rgba(201,162,39,.3);white-space:nowrap;background:#0f1529;">${m.label}</th>`).join('');
+  const emailMonths=modelMonths.map(m=>`<th style="padding:7px 8px;text-align:right;font-family:courier,monospace;font-size:9px;font-weight:700;color:${m.isActual?'#15803d':'#0f766e'};border-bottom:1px solid #d6dee3;white-space:nowrap;background:${m.isActual?'#f3faf5':'#f4fbfc'};">${m.label}</th>`).join('');
   const emailOpRows=[
-    {label:'Cash Revenue',vals:modelMonths.map(m=>m.displayRevenue)},
-    {label:'PMG Clients',vals:modelMonths.map(m=>m.pmgClients||0),clients:true},
-    {label:'SEO Clients',vals:modelMonths.map(m=>m.seoClients||0),clients:true},
-    {label:'Call Center Cost',vals:modelMonths.map(m=>m.callCenterCost||0)},
-    {label:'Total Costs',vals:modelMonths.map(m=>m.totalCost)},
-    {label:'Operating Profit',vals:modelMonths.map(m=>m.displayProfit)}
+    {label:'Cash Revenue',vals:modelMonths.map(m=>m.displayRevenue),type:'money'},
+    {label:'Plan Revenue',vals:modelMonths.map(m=>m.isActual?m.planRevenue:m.displayRevenue),type:'money',muted:true},
+    {label:'Revenue Variance vs Plan',vals:modelMonths.map(m=>m.varianceRevenue),type:'variance'},
+    {label:'PMG Clients Converted',vals:modelMonths.map(m=>m.pmgClients),type:'clients'},
+    {label:'TC SEO Clients Converted',vals:modelMonths.map(m=>m.seoClients),type:'clients'},
+    {label:'SEO Qual Agents Needed',vals:modelMonths.map(m=>m.isActual?null:(m.callCenterAgents||0)),type:'clients',muted:true},
+    {label:'Base Staffing',vals:modelMonths.map(m=>m.baseStaff),type:'money',cost:true},
+    {label:'Core Sales Staffing',vals:modelMonths.map(m=>m.salesStaff),type:'money',cost:true},
+    {label:'Call Center Labor',vals:modelMonths.map(m=>m.isActual?null:(m.callCenterLabor||0)),type:'money',cost:true},
+    {label:'Dialer / Seat Stack',vals:modelMonths.map(m=>m.isActual?null:(m.callCenterDialer||0)),type:'money',cost:true},
+    {label:'QA / Shrinkage Buffer',vals:modelMonths.map(m=>m.isActual?null:(m.callCenterBuffer||0)),type:'money',cost:true},
+    {label:'Call Center Cost',vals:modelMonths.map(m=>m.callCenterCost||0),type:'money',cost:true},
+    {label:'TC SEO Sales Commission',vals:modelMonths.map(m=>m.commission||0),type:'money',cost:true},
+    {label:'Fixed (software+phones)',vals:modelMonths.map(()=>FIXED_OTHER),type:'money',cost:true},
+    {label:'PMG Retainer',vals:modelMonths.map(m=>m.pmgRetainer),type:'money',cost:true},
+    {label:'SEO / Marketing',vals:modelMonths.map(m=>m.seoCost),type:'money',cost:true},
+    {label:'Total Costs',vals:modelMonths.map(m=>m.totalCost),type:'money',cost:true,bold:true},
+    {label:'Cash Operating Profit',vals:modelMonths.map(m=>m.displayProfit),type:'profit',bold:true},
+    {label:'Plan Profit',vals:modelMonths.map(m=>m.isActual?m.planProfit:m.displayProfit),type:'money',muted:true},
+    {label:'Profit Variance vs Plan',vals:modelMonths.map(m=>m.varianceProfit),type:'variance'},
+    {label:'Cash Margin %',vals:modelMonths.map(m=>m.margin),type:'pct'}
   ];
-  const emailOpTable=`<div style="margin:18px 0;"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#7FD2D8;">Monthly Operating View — Actual / Forecast</div><div style="overflow-x:auto;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;min-width:100%;"><thead><tr><th style="padding:7px 8px;text-align:left;font-size:10px;font-weight:700;color:#c9a227;border-bottom:1px solid rgba(201,162,39,.3);white-space:nowrap;background:#0f1529;min-width:140px;">Metric</th>${emailMonths}</tr></thead><tbody>${emailOpRows.map(r=>`<tr><td style="padding:6px 8px;font-size:11px;color:#7a869e;white-space:nowrap;background:#f8fafc;">${r.label}</td>${r.vals.map((v,i)=>`<td style="padding:6px 8px;text-align:right;font-family:courier,monospace;font-size:10px;background:${modelMonths[i].isActual?'#edf7f0':'#ffffff'};color:${!r.clients&&v<0?'#dc2626':'#1a2340'};">${r.clients?Math.round(v||0).toLocaleString():fmt(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+  // Email table cell renderer
+  function emailCell(v, r, isActual) {
+    const bg = isActual ? '#f7fcf8' : '#ffffff';
+    const border = '1px solid #edf2f7';
+    const base = `padding:6px 8px;text-align:right;font-family:courier,monospace;font-size:10px;border-bottom:${border};background:${bg};`;
+    const fw = r.bold ? 'font-weight:700;' : '';
+    if (v === null) return `<td style="${base}${fw}color:#94a3b8;">—</td>`;
+    if (r.type === 'clients') return `<td style="${base}${fw}color:#0f172a;">${Math.round(v||0).toLocaleString()}</td>`;
+    if (r.type === 'variance') {
+      const c = v > 0 ? '#15803d' : v < 0 ? '#b91c1c' : '#92400e';
+      return `<td style="${base}${fw}color:${c};">${fmtE(v)}</td>`;
+    }
+    if (r.type === 'profit') {
+      const c = v >= 0 ? '#15803d' : '#b91c1c';
+      return `<td style="${base}${fw}color:${c};">${fmtE(v)}</td>`;
+    }
+    if (r.type === 'pct') {
+      if (v === null) return `<td style="${base}color:#94a3b8;">—</td>`;
+      const c = v >= 0.3 ? '#15803d' : v >= 0 ? '#92400e' : '#b91c1c';
+      return `<td style="${base}color:${c};">${(v*100).toFixed(0)}%</td>`;
+    }
+    // money / cost
+    const color = r.cost ? (v > 0 ? '#7c3aed' : '#0f172a') : r.muted ? '#64748b' : '#0f172a';
+    return `<td style="${base}${fw}color:${color};">${fmtE(v)}</td>`;
+  }
 
-  const emailHtml=`<div style="font-family:Arial,Helvetica,sans-serif;color:#e7f0f0;line-height:1.5;"><div style="max-width:900px;margin:0 auto;border:1px solid #d7e4e7;border-radius:12px;overflow:hidden;"><div style="background:#0f1529;padding:18px 22px;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td width="50"><div style="width:44px;height:44px;background:linear-gradient(135deg,#c9a227,#e8c547);border-radius:10px;text-align:center;line-height:44px;"><span style="font-family:courier,monospace;font-size:16px;font-weight:700;color:#0a0e1a;">TC</span></div></td><td style="padding-left:12px;"><div style="font-size:18px;font-weight:700;color:#eef0f5;">Timeshare Counsel LLC</div><div style="font-size:11px;color:#7a869e;margin-top:2px;">Partner Operating Report - Confidential</div></td><td align="right"><span style="font-family:courier,monospace;font-size:10px;color:#c9a227;background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);border-radius:4px;padding:4px 10px;">${safeHtml(todayStamp())}</span></td></tr></table></div><div style="background:linear-gradient(90deg,#c9a227,#e8c547,#c9a227);height:3px;"></div><div style="background:#162040;padding:9px 22px;"><span style="font-size:11px;color:#7a869e;">Actuals through <strong style="color:#eef0f5;">${safeHtml(cutoffLabel)}</strong> · Scenario: ${safeHtml(currentScenarioName)}</span></div><div style="padding:20px 22px;background:#0f1529;"><p style="margin:0 0 14px 0;">Team,</p><p style="margin:0 0 18px 0;">Below is the current operating update based on actuals through <strong>${safeHtml(cutoffLabel)}</strong>.</p><table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:18px;"><tr><td style="width:50%;padding:12px 14px;background:#162040;border:1px solid rgba(79,167,175,.25);"><div style="font-size:10px;font-weight:600;color:#7FD2D8;text-transform:uppercase;letter-spacing:.06em;">Actual Cash Collected</div><div style="font-size:19px;font-weight:700;color:#ffffff;">${safeHtml(fmt(actualCashCollected))}</div></td><td style="width:50%;padding:12px 14px;background:#162040;border:1px solid rgba(79,167,175,.25);"><div style="font-size:10px;font-weight:600;color:#7FD2D8;text-transform:uppercase;letter-spacing:.06em;">YTD Revenue Var vs Plan</div><div style="font-size:19px;font-weight:700;color:#ffffff;">${safeHtml(fmt(ytdRevenueVariance))}</div></td></tr><tr><td style="padding:12px 14px;background:#162040;border:1px solid rgba(79,167,175,.25);"><div style="font-size:10px;font-weight:600;color:#7FD2D8;text-transform:uppercase;letter-spacing:.06em;">Cash Trough</div><div style="font-size:19px;font-weight:700;color:#ffffff;">${safeHtml(fmt(trough))}</div><div style="font-size:11px;color:#a0b4b8;">${safeHtml(troughMonth)}</div></td><td style="padding:12px 14px;background:#162040;border:1px solid rgba(79,167,175,.25);"><div style="font-size:10px;font-weight:600;color:#7FD2D8;text-transform:uppercase;letter-spacing:.06em;">Reserve Gap</div><div style="font-size:19px;font-weight:700;color:#ffffff;">${safeHtml(fmt(reserveShortfall))}</div></td></tr></table><div style="margin-bottom:18px;"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#7FD2D8;">Call center assumptions</div><ul style="margin:0 0 12px 18px;padding:0;color:#c8d4d6;"><li>${document.getElementById('cc-capacity').value} SEO leads per agent per month</li><li>$${Number(document.getElementById('cc-dialer').value).toLocaleString()} dialer per seat</li><li>${document.getElementById('cc-buffer').value}% QA / shrinkage buffer</li></ul><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#7FD2D8;">Key highlights</div><ul style="margin:0 0 0 18px;padding:0;color:#c8d4d6;">${bullets.map(b=>`<li style="margin-bottom:7px;">${safeHtml(b)}</li>`).join('')}</ul></div>${emailOpTable}<div style="margin-bottom:18px;"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#7FD2D8;">Projected Distribution After Reserve</div><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="25%" style="padding:6px;"><div style="background:#fffbeb;border:1px solid #fde68a;border-top:4px solid #f59e0b;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;margin-bottom:6px;">Reserve Funded</div><div style="font-family:courier,monospace;font-size:18px;font-weight:700;color:#f59e0b;">${fmtEmail(fundedReserve)}</div><div style="font-size:10px;color:#7a869e;margin-top:4px;">Target: ${fmtEmail(reserveTarget)}</div></div></td><td width="25%" style="padding:6px;"><div style="background:#f0fdf4;border:1px solid #bbf7d0;border-top:4px solid #059669;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;margin-bottom:6px;">Staff Bonus</div><div style="font-family:courier,monospace;font-size:18px;font-weight:700;color:#059669;">${fmtEmail(staffBonus)}</div></div></td><td width="25%" style="padding:6px;"><div style="background:#e6f8fb;border:1px solid #99d9e1;border-top:4px solid #4FA7AF;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#4FA7AF;text-transform:uppercase;margin-bottom:6px;">D</div><div style="font-family:courier,monospace;font-size:18px;font-weight:700;color:#4FA7AF;">${fmtEmail(dShare)}</div></div></td><td width="25%" style="padding:6px;"><div style="background:#eef7fb;border:1px solid #c7d9e8;border-top:4px solid #7FD2D8;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#4FA7AF;text-transform:uppercase;margin-bottom:6px;">Chris / Shekeb</div><div style="font-family:courier,monospace;font-size:16px;font-weight:700;color:#4FA7AF;">${fmtEmail(chrisShare)} / ${fmtEmail(shekebShare)}</div></div></td></tr></table></div><div style="margin-bottom:18px;"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#7FD2D8;">Management notes</div><div style="font-size:13px;white-space:pre-wrap;color:#c8d4d6;">${safeHtml(notes||'No additional management notes entered.')}</div></div><p style="margin:18px 0 0 0;">Best,<br>Timeshare Counsel</p></div><div style="background:linear-gradient(90deg,#c9a227,#e8c547,#c9a227);height:3px;"></div><div style="background:#0f1529;border-radius:0 0 12px 12px;padding:14px 22px;"><span style="font-size:11px;color:#7a869e;">Timeshare Counsel LLC · Confidential</span></div></div></div>`;
+  // Row totals for email
+  function emailRowTotal(r) {
+    if (r.type === 'pct') return null;
+    if (r.type === 'clients') return modelMonths.reduce((s,m)=>s+(r.vals[m.gi-0]||0),0);
+    return r.vals.reduce((s,v)=>s+(v||0),0);
+  }
 
-  const plainText=['Timeshare Counsel Monthly Operating Update','','Generated: '+todayStamp(),'Scenario: '+currentScenarioName,'Actuals through: '+cutoffLabel,'','Key metrics','- Actual cash collected: '+fmt(actualCashCollected),'- YTD revenue variance: '+fmt(ytdRevenueVariance),'- Cash trough: '+fmt(trough)+' in '+troughMonth,'- Reserve funded: '+fmt(fundedReserve),'- Reserve gap: '+fmt(reserveShortfall),'- First profitable month: '+(firstFutureProfitMonth||'None'),'- Cumulative break-even: '+(cumulativeBE||'None'),'','Call center','- SEO lead capacity per agent: '+document.getElementById('cc-capacity').value,'- Dialer cost per seat: $'+Number(document.getElementById('cc-dialer').value).toLocaleString(),'- QA / shrinkage buffer: '+document.getElementById('cc-buffer').value+'%','','Summary'].concat(bullets.map(b=>'- '+b)).concat(['','Monthly Operating View']).concat(modelMonths.map(m=>`${m.label}: Rev ${fmt(m.displayRevenue)} | PMG ${Math.round(m.pmgClients||0)} | SEO ${Math.round(m.seoClients||0)} | CC ${fmt(m.callCenterCost||0)} | Cost ${fmt(m.totalCost)} | Profit ${fmt(m.displayProfit)}`)).concat(['','Management notes',notes||'No additional management notes entered.']).join('\n');
+  const emailOpTable=`<div style="margin:18px 0;"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#0f766e;">Monthly Operating View — Actual / Plan / Forecast</div><div style="overflow-x:auto;border:1px solid #d6dee3;border-radius:10px;background:#ffffff;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;min-width:100%;background:#ffffff;"><thead><tr><th style="padding:7px 8px;text-align:left;font-size:10px;font-weight:700;color:#8a6a11;border-bottom:2px solid #d6dee3;white-space:nowrap;background:#f8fafc;min-width:180px;">Metric</th>${emailMonths}<th style="padding:7px 8px;text-align:right;font-size:9px;font-weight:700;color:#8a6a11;border-bottom:2px solid #d6dee3;white-space:nowrap;background:#f8fafc;">Total / YTD</th></tr></thead><tbody>${emailOpRows.map((r,ri)=>{
+    const isSectionTotal = r.bold;
+    const rowBg = isSectionTotal ? 'background:#f1f5f9;border-top:2px solid #cbd5e1;' : '';
+    const labelStyle = `padding:6px 8px;font-size:${isSectionTotal?'11':'10'}px;${isSectionTotal?'font-weight:700;':''}color:${isSectionTotal?'#0f172a':'#475569'};white-space:nowrap;background:#f8fafc;border-bottom:1px solid #edf2f7;${isSectionTotal?'border-top:2px solid #cbd5e1;':''}`;
+    const cells = r.vals.map((v,i) => emailCell(v, r, modelMonths[i].isActual)).join('');
+    const tot = emailRowTotal(r);
+    const totalCell = tot === null ? `<td style="padding:6px 8px;text-align:right;font-family:courier,monospace;font-size:10px;background:#f8fafc;border-bottom:1px solid #edf2f7;color:#94a3b8;">—</td>` : (() => {
+      const fw = r.bold ? 'font-weight:700;' : '';
+      if (r.type === 'clients') return `<td style="padding:6px 8px;text-align:right;font-family:courier,monospace;font-size:10px;${fw}background:#f8fafc;border-bottom:1px solid #edf2f7;color:#0f172a;">${Math.round(tot).toLocaleString()}</td>`;
+      if (r.type === 'variance') { const c = tot>0?'#15803d':tot<0?'#b91c1c':'#92400e'; return `<td style="padding:6px 8px;text-align:right;font-family:courier,monospace;font-size:10px;${fw}background:#f8fafc;border-bottom:1px solid #edf2f7;color:${c};">${fmtE(tot)}</td>`; }
+      if (r.type === 'profit') { const c = tot>=0?'#15803d':'#b91c1c'; return `<td style="padding:6px 8px;text-align:right;font-family:courier,monospace;font-size:10px;${fw}background:#f8fafc;border-bottom:1px solid #edf2f7;color:${c};">${fmtE(tot)}</td>`; }
+      const color = r.cost ? '#7c3aed' : r.muted ? '#64748b' : '#0f172a';
+      return `<td style="padding:6px 8px;text-align:right;font-family:courier,monospace;font-size:10px;${fw}background:#f8fafc;border-bottom:1px solid #edf2f7;color:${color};">${fmtE(tot)}</td>`;
+    })();
+    return `<tr style="${rowBg}"><td style="${labelStyle}">${r.label}</td>${cells}${totalCell}</tr>`;
+  }).join('')}</tbody></table></div></div>`;
+
+  const emailHtml=`<div style="font-family:Arial,Helvetica,sans-serif;color:#e7f0f0;line-height:1.5;"><div style="max-width:900px;margin:0 auto;border:1px solid #d7e4e7;border-radius:12px;overflow:hidden;"><div style="background:#0f1529;padding:18px 22px;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td width="50"><div style="width:44px;height:44px;background:linear-gradient(135deg,#c9a227,#e8c547);border-radius:10px;text-align:center;line-height:44px;"><span style="font-family:courier,monospace;font-size:16px;font-weight:700;color:#0a0e1a;">TC</span></div></td><td style="padding-left:12px;"><div style="font-size:18px;font-weight:700;color:#eef0f5;">Timeshare Counsel LLC</div><div style="font-size:11px;color:#7a869e;margin-top:2px;">Partner Operating Report - Confidential</div></td><td align="right"><span style="font-family:courier,monospace;font-size:10px;color:#c9a227;background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);border-radius:4px;padding:4px 10px;">${safeHtml(todayStamp())}</span></td></tr></table></div><div style="background:linear-gradient(90deg,#c9a227,#e8c547,#c9a227);height:3px;"></div><div style="background:#ecfeff;padding:9px 22px;border-bottom:1px solid #d6dee3;"><span style="font-size:11px;color:#334155;">Actuals through <strong style="color:#0f172a;">${safeHtml(cutoffLabel)}</strong> · Scenario: ${safeHtml(currentScenarioName)}</span></div><div style="padding:20px 22px;background:#ffffff;color:#334155;"><p style="margin:0 0 14px 0;">Team,</p><p style="margin:0 0 18px 0;">Below is the current operating update based on actuals through <strong>${safeHtml(cutoffLabel)}</strong>.</p><table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:18px;"><tr><td style="width:50%;padding:12px 14px;background:#f8fafc;border:1px solid #d6dee3;"><div style="font-size:10px;font-weight:600;color:#0f766e;text-transform:uppercase;letter-spacing:.06em;">Actual Cash Collected</div><div style="font-size:19px;font-weight:700;color:#0f172a;">${safeHtml(fmt(actualCashCollected))}</div></td><td style="width:50%;padding:12px 14px;background:#f8fafc;border:1px solid #d6dee3;"><div style="font-size:10px;font-weight:600;color:#0f766e;text-transform:uppercase;letter-spacing:.06em;">YTD Revenue Var vs Plan</div><div style="font-size:19px;font-weight:700;color:${ytdRevenueVariance<0?'#b91c1c':'#0f172a'};">${safeHtml(fmt(ytdRevenueVariance))}</div></td></tr><tr><td style="padding:12px 14px;background:#f8fafc;border:1px solid #d6dee3;"><div style="font-size:10px;font-weight:600;color:#0f766e;text-transform:uppercase;letter-spacing:.06em;">Cash Trough</div><div style="font-size:19px;font-weight:700;color:#0f172a;">${safeHtml(fmt(trough))}</div><div style="font-size:11px;color:#64748b;">${safeHtml(troughMonth)}</div></td><td style="padding:12px 14px;background:#f8fafc;border:1px solid #d6dee3;"><div style="font-size:10px;font-weight:600;color:#0f766e;text-transform:uppercase;letter-spacing:.06em;">Reserve Gap</div><div style="font-size:19px;font-weight:700;color:#0f172a;">${safeHtml(fmt(reserveShortfall))}</div></td></tr></table><div style="margin-bottom:18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px;">
+  <div style="font-size:12px;font-weight:700;margin-bottom:12px;color:#0f172a;text-transform:uppercase;letter-spacing:.06em;">Model Assumptions</div>
+  <table cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;font-size:11px;">
+    <tr>
+      <td colspan="4" style="padding:0 0 8px 0;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e8f0;">Conversion &amp; Fees</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 8px 6px 0;color:#475569;width:25%;">PMG Conversion Rate</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;width:25%;">${document.getElementById('cr-pmg').value}%</td>
+      <td style="padding:6px 8px;color:#475569;width:25%;">TC SEO Conversion Rate</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;width:25%;">${document.getElementById('cr-exitco').value}%</td>
+    </tr>
+    <tr style="background:#ffffff;">
+      <td style="padding:6px 8px 6px 0;color:#475569;">PMG Net Fee / Client</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">$${Number(document.getElementById('f-pmg').value).toLocaleString()}</td>
+      <td style="padding:6px 8px;color:#475569;">TC SEO Net Fee / Client</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">$${Number(document.getElementById('f-exitco').value).toLocaleString()}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 8px 6px 0;color:#475569;">SEO Sales Commission</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">${document.getElementById('c-comm').value}%</td>
+      <td style="padding:6px 8px;color:#475569;">Attrition / Refund Rate</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">${document.getElementById('c-attr').value}%</td>
+    </tr>
+    <tr style="background:#ffffff;">
+      <td style="padding:6px 8px 6px 0;color:#475569;">Remaining PMG Prospects</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">${document.getElementById('v-pmg').value}</td>
+      <td style="padding:6px 8px;color:#475569;">&nbsp;</td>
+      <td style="padding:6px 8px;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="4" style="padding:10px 0 8px 0;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e8f0;border-top:1px solid #e2e8f0;margin-top:4px;">Cost Inputs</td>
+    </tr>
+    <tr style="background:#ffffff;">
+      <td style="padding:6px 8px 6px 0;color:#475569;">SEO + PPC / Month</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">$${Number(document.getElementById('c-mkt').value).toLocaleString()}</td>
+      <td style="padding:6px 8px;color:#475569;">Staff Bonus %</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">${document.getElementById('d-bonus').value}%</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 8px 6px 0;color:#475569;">Reserve Floor</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">$${Number(document.getElementById('d-reserve').value).toLocaleString()}</td>
+      <td style="padding:6px 8px;color:#475569;">&nbsp;</td>
+      <td style="padding:6px 8px;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="4" style="padding:10px 0 8px 0;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e8f0;border-top:1px solid #e2e8f0;">Collection Timing</td>
+    </tr>
+    <tr style="background:#ffffff;">
+      <td style="padding:6px 8px 6px 0;color:#475569;">Upfront Collection %</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">${document.getElementById('col-up').value}%</td>
+      <td style="padding:6px 8px;color:#475569;">Deferred Lag (months)</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">${document.getElementById('col-lag').value} mo</td>
+    </tr>
+    <tr>
+      <td colspan="4" style="padding:10px 0 8px 0;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e8f0;border-top:1px solid #e2e8f0;">SEO Qualification Center</td>
+    </tr>
+    <tr style="background:#ffffff;">
+      <td style="padding:6px 8px 6px 0;color:#475569;">Lead Capacity / Agent</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">${document.getElementById('cc-capacity').value} leads/mo</td>
+      <td style="padding:6px 8px;color:#475569;">Dialer / Seat / Month</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">$${Number(document.getElementById('cc-dialer').value).toLocaleString()}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 8px 6px 0;color:#475569;">QA / Shrinkage Buffer</td>
+      <td style="padding:6px 8px;font-family:courier,monospace;font-weight:700;color:#0f172a;">${document.getElementById('cc-buffer').value}%</td>
+      <td style="padding:6px 8px;">&nbsp;</td>
+      <td style="padding:6px 8px;">&nbsp;</td>
+    </tr>
+  </table>
+</div>
+<div style="margin-bottom:18px;"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#0f766e;">Key highlights</div><ul style="margin:0 0 0 18px;padding:0;color:#334155;">${bullets.map(b=>`<li style="margin-bottom:7px;">${safeHtml(b)}</li>`).join('')}</ul></div>${emailOpTable}<div style="margin-bottom:18px;"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#0f766e;">Projected Distribution After Reserve</div><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="20%" style="padding:6px;"><div style="background:#eef7fb;border:1px solid #c7d9e8;border-top:4px solid #7FD2D8;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#0f766e;text-transform:uppercase;margin-bottom:6px;">Cum. Profit</div><div style="font-family:courier,monospace;font-size:16px;font-weight:700;color:#0f172a;">${fmtEmail(cumulativeProfit)}</div></div></td><td width="20%" style="padding:6px;"><div style="background:#fffbeb;border:1px solid #fde68a;border-top:4px solid #f59e0b;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;margin-bottom:6px;">Reserve Funded</div><div style="font-family:courier,monospace;font-size:16px;font-weight:700;color:#b45309;">${fmtEmail(fundedReserve)}</div></div></td><td width="20%" style="padding:6px;"><div style="background:#f0fdf4;border:1px solid #bbf7d0;border-top:4px solid #059669;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;margin-bottom:6px;">Distributable</div><div style="font-family:courier,monospace;font-size:16px;font-weight:700;color:#059669;">${fmtEmail(distributableBase)}</div></div></td><td width="20%" style="padding:6px;"><div style="background:#e6f8fb;border:1px solid #99d9e1;border-top:4px solid #4FA7AF;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#4FA7AF;text-transform:uppercase;margin-bottom:6px;">Dharmesh</div><div style="font-family:courier,monospace;font-size:16px;font-weight:700;color:#0f172a;">${fmtEmail(dShare)}</div></div></td><td width="20%" style="padding:6px;"><div style="background:#eef7fb;border:1px solid #c7d9e8;border-top:4px solid #7FD2D8;border-radius:8px;padding:14px;text-align:center;"><div style="font-size:10px;font-weight:700;color:#4FA7AF;text-transform:uppercase;margin-bottom:6px;">Chris / Shekeb</div><div style="font-family:courier,monospace;font-size:14px;font-weight:700;color:#0f172a;">${fmtEmail(chrisShare)} / ${fmtEmail(shekebShare)}</div></div></td></tr></table></div><div style="margin-bottom:18px;"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#0f766e;">Management notes</div><div style="font-size:13px;white-space:pre-wrap;color:#334155;">${safeHtml(notes||'No additional management notes entered.')}</div></div><p style="margin:18px 0 0 0;color:#334155;">Best,<br>Timeshare Counsel</p></div><div style="background:linear-gradient(90deg,#c9a227,#e8c547,#c9a227);height:3px;"></div><div style="background:#0f1529;border-radius:0 0 12px 12px;padding:14px 22px;"><span style="font-size:11px;color:#7a869e;">Timeshare Counsel LLC · Confidential</span></div></div></div>`;
+
+  const plainText=['Timeshare Counsel Monthly Operating Update','','Generated: '+todayStamp(),'Scenario: '+currentScenarioName,'Actuals through: '+cutoffLabel,'','Key metrics','- Actual cash collected: '+fmt(actualCashCollected),'- YTD revenue variance: '+fmt(ytdRevenueVariance),'- Cash trough: '+fmt(trough)+' in '+troughMonth,'- Reserve funded: '+fmt(fundedReserve),'- Reserve gap: '+fmt(reserveShortfall),'- First profitable month: '+(firstFutureProfitMonth||'None'),'- Cumulative break-even: '+(cumulativeBE||'None'),'','Call center','- SEO lead capacity per agent: '+document.getElementById('cc-capacity').value,'- Dialer cost per seat: $'+Number(document.getElementById('cc-dialer').value).toLocaleString(),'- QA / shrinkage buffer: '+document.getElementById('cc-buffer').value+'%','','Distribution','- Cumulative profit: '+fmt(cumulativeProfit),'- Distributable after reserve: '+fmt(distributableBase),'','Summary'].concat(bullets.map(b=>'- '+b)).concat(['','Monthly Operating View']).concat(modelMonths.map(m=>`${m.label}: Rev ${fmt(m.displayRevenue)} | PMG ${Math.round(m.pmgClients||0)} | SEO ${Math.round(m.seoClients||0)} | CC ${fmt(m.callCenterCost||0)} | Cost ${fmt(m.totalCost)} | Profit ${fmt(m.displayProfit)}`)).concat(['','Management notes',notes||'No additional management notes entered.']).join('\n');
 
   document.getElementById('email-html-output').value=emailHtml;
   document.getElementById('email-text-output').value=plainText;
@@ -781,7 +999,7 @@ function loadScenario(name,btn){
     custom:null
   };
   if(name==='custom') return;
-  Object.entries(s[name]).forEach(([k,v])=>document.getElementById(k).value=v);
+  Object.entries(s[name]).forEach(([k,v])=>{ const el=document.getElementById(k); if(el) el.value=v; });
   if(name==='low'){ loadEcPreset('cons'); loadSalesPreset('cons'); loadCallCenterPreset('cons'); currentScenarioName='Bear'; }
   else if(name==='high'){ loadEcPreset('agg'); loadSalesPreset('heavy'); loadCallCenterPreset('agg'); currentScenarioName='Bull'; }
   else{ loadEcPreset('mod'); loadSalesPreset('base'); loadCallCenterPreset('base'); currentScenarioName='Base'; }
@@ -792,6 +1010,7 @@ function generateEmail(){ const html=document.getElementById('email-html-output'
 function copyEmail(){ if(!_lastEmailHtml) return; navigator.clipboard.writeText(_lastEmailHtml).then(()=>{ const el=document.getElementById('email-copied'); el.style.opacity='1'; setTimeout(()=>el.style.opacity='0',2000); }).catch(()=>{ const ta=document.createElement('textarea'); ta.value=_lastEmailHtml; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); const el=document.getElementById('email-copied'); el.style.opacity='1'; setTimeout(()=>el.style.opacity='0',2000); }); }
 
 buildLastActualSelect();
+buildModelEndSelect();
 buildEcGrid();
 buildSalesGrid();
 buildGrid('actual-revenue-grid','act-rev',ACTUAL_DEFAULTS.revenue);
@@ -804,7 +1023,9 @@ buildGrid('actual-callcenter-grid','act-call',ACTUAL_DEFAULTS.callcenter);
 highlightEcPreset();
 highlightSalesPreset();
 loadCallCenterPreset('base');
-update();
+
+const rawSaved=localStorage.getItem(MODEL_STORAGE_KEY);
+if(rawSaved){ try{ applyModelState(JSON.parse(rawSaved)); document.getElementById('save-status').textContent='Saved model loaded automatically.'; } catch(e){ update(); } } else { update(); }
 </script>
 </body>
 </html>
